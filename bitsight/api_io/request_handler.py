@@ -23,6 +23,9 @@ class Status(Enum):
         self.description = description
 
 
+"""Use threading for pagination"""
+THREADED_PAGINATION = True
+
 """Number of seconds in a minute"""
 ONE_MINUTE = 60.0
 
@@ -47,49 +50,48 @@ BST_API_KEY = "BST_API_KEY"
 
 
 def pagination(func):
+    """
+    Decorator to add to a function to process an endpoint with a paginated return
+    If THREADED_PAGINATION is true, then the pagination is processed by concurrent
+    threds, otherwise it is processed in serial
+    :param func: the function to process for paginated output
+    :return: total result of all calls as a json
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         first = func(*args, **kwargs)
         response_json = first.json()
         results = response_json[RESULTS]
-        links = first.json().get(LINKS)
-
-        while links and links.get(NEXT):
-            response = func(request_url=links.get(NEXT), cookies=first.cookies, *args, **kwargs)
-            links = response.json().get(LINKS)
-            results.extend(response.json()[RESULTS])
-
-        return results
-
-    return wrapper
-
-
-def threaded_pagination(func):
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if kwargs.get('params'):
-            params = kwargs.get('params')
-        else:
-            params = {}
-        first = func(params=params, *args, **kwargs)
-        response_json = first.json()
-        results = response_json[RESULTS]
-        total_req_number = int(response_json['count'] / 100)
-        if response_json['count'] % 100 != 0:
+        count = response_json['count']
+        total_req_number = int(count / 100)
+        if count % 100 != 0:
             total_req_number += 1
-        if total_req_number > 1:
+
+        if THREADED_PAGINATION:
+            params = kwargs.get('params', {})
             param_list = [{'limit': 100, 'offset': str(n * 100)} for n in range(1, total_req_number)]
             threads = []
             max_threads = 3
             with ThreadPoolExecutor(max_workers=max_threads) as executor:
                 for param in param_list:
                     param.update(params)
-                    threads.append(executor.submit(func, params=param, *args, **kwargs))
+                    kwargs['params'] = param
+                    kwargs['cookies'] = first.cookies
+                    threads.append(executor.submit(func, *args, **kwargs))
 
-            for task in as_completed(threads):
-                results.extend(task.result().json()[RESULTS])
+                for task in as_completed(threads):
+                    results.extend(task.result().json()[RESULTS])
+        else:
+            links = first.json().get(LINKS)
+
+            while links.get(NEXT):
+                kwargs['cookies'] = first.cookies
+                kwargs['request_url'] = links.get(NEXT)
+                response = func(*args, **kwargs)
+                links = response.json().get(LINKS)
+                results.extend(response.json()[RESULTS])
 
         return results
 
@@ -213,6 +215,28 @@ class RequestHandler:
             self.back_off(status_code=response.status_code)
             response = requests.post(request_url, auth=(self.api_key, EMPTY_STRING), params=params, json=json,
                                      headers=headers)
+
+        self.factor = 0.0
+        return response
+
+    def delete(self, request_url, headers=None):
+        """
+        Handles delete requests and handles rate limiting
+        :param request_url: the url to process for the DELETE request
+        :param headers: the headers for the request
+        :return: response object with status code, text, etc.
+        """
+        if headers is None:
+            headers = self.HEADERS
+        response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
+        while response.status_code == Status.rate_limited.code:
+            retry_after = float(response.headers[RETRY_AFTER])
+            self.back_off(retry_after=retry_after, status_code=response.status_code)
+            response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
+
+        while response.status_code >= Status.server_error.code:
+            self.back_off(status_code=response.status_code)
+            response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
 
         self.factor = 0.0
         return response
