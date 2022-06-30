@@ -3,6 +3,7 @@ import os
 import threading
 import time
 from enum import Enum
+from functools import wraps
 
 import requests
 
@@ -45,6 +46,56 @@ RETRY_AFTER = "Retry-After"
 BST_API_KEY = "BST_API_KEY"
 
 
+def pagination(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        first = func(*args, **kwargs)
+        response_json = first.json()
+        results = response_json[RESULTS]
+        links = first.json().get(LINKS)
+
+        while links and links.get(NEXT):
+            response = func(request_url=links.get(NEXT), cookies=first.cookies, *args, **kwargs)
+            links = response.json().get(LINKS)
+            results.extend(response.json()[RESULTS])
+
+        return results
+
+    return wrapper
+
+
+def threaded_pagination(func):
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if kwargs.get('params'):
+            params = kwargs.get('params')
+        else:
+            params = {}
+        first = func(params=params, *args, **kwargs)
+        response_json = first.json()
+        results = response_json[RESULTS]
+        total_req_number = int(response_json['count'] / 100)
+        if response_json['count'] % 100 != 0:
+            total_req_number += 1
+        if total_req_number > 1:
+            param_list = [{'limit': 100, 'offset': str(n * 100)} for n in range(1, total_req_number)]
+            threads = []
+            max_threads = 3
+            with ThreadPoolExecutor(max_workers=max_threads) as executor:
+                for param in param_list:
+                    param.update(params)
+                    threads.append(executor.submit(func, params=param, *args, **kwargs))
+
+            for task in as_completed(threads):
+                results.extend(task.result().json()[RESULTS])
+
+        return results
+
+    return wrapper
+
+
 class RequestHandler:
     """
     Class for handling calls to the BitSight API
@@ -57,9 +108,6 @@ class RequestHandler:
     HEADERS = {"Accept": "application/json"}
     _instance = None
     _lock = threading.Lock()
-    REPORTS_ENDPOINT = 'https://api.bitsighttech.com/v1/reports/'
-    PORTFOLIO_ENDPOINT = "https://api.bitsighttech.com/v2/portfolio"
-    COMPANIES_ENDPOINT = "https://api.bitsighttech.com/v1/companies/"
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -184,16 +232,3 @@ class RequestHandler:
         print('Error or Rate Limiting: Retrying in ', wait_time, ' seconds')
         self.factor += self.GROWTH_FACTOR
         time.sleep(wait_time)
-
-    def pagination(self, request_url, params=None, headers=None):
-
-        first = self.get(request_url, params, headers)
-        response_json = first.json()
-        links = first.json().get(LINKS)
-
-        while links and links.get(NEXT):
-            response = self.get(links.get(NEXT), headers, cookies=first.cookies)
-            links = response.json().get(LINKS)
-            response_json[RESULTS].extend(response_json[RESULTS])
-
-        return response_json
