@@ -30,7 +30,7 @@ class Companies:
         :param cookies: cookies for the request
         :return: json representation of the details for the company
         """
-        return self.handler.get(request_url=self.COMPANIES_ENDPOINT + guid, params=params, cookies=cookies)
+        return self.handler.get(request_url=self.COMPANIES_ENDPOINT + guid, params=params, cookies=cookies).json()
 
     @pagination
     def get_company_search(self, domain=None, params=None, request_url=None, cookies=None):
