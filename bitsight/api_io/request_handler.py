@@ -116,9 +116,13 @@ class RequestHandler:
             with cls._lock:
                 if not cls._instance:
                     cls._instance = super(RequestHandler, cls).__new__(cls)
+                    cls._instance.__initialized = False
         return cls._instance
 
     def __init__(self):
+        if self.__initialized:
+            return
+        self.__initialized = True
         self.api_key = os.environ.get(BST_API_KEY)
         if self.api_key is None or self.api_key == EMPTY_STRING:
             self.api_key = input("Please enter your BitSight API Kry: ")
@@ -247,12 +251,12 @@ class RequestHandler:
         :param retry_after: the period of time specified to retry after (passed from api response)
         :param status_code: the status code of the response (passed from the api response)
         """
-        print('Response Code:', status_code)
+        print(f'Response Code: {status_code}')
         if retry_after is not None:
             self.base_wait_time = retry_after
             wait_time = retry_after * (1.0 + self.factor)
         else:
             wait_time = self.base_wait_time * (1.0 + self.factor)
-        print('Error or Rate Limiting: Retrying in ', wait_time, ' seconds')
+        print(f'Error or Rate Limiting: Retrying in {wait_time} seconds')
         self.factor += self.GROWTH_FACTOR
         time.sleep(wait_time)

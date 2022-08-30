@@ -2,8 +2,8 @@ from bitsight.api_io.request_handler import RequestHandler, pagination
 
 
 class Portfolio:
-    V2_PORTFOLIO_ENDPOINT = "https://api.bitsighttech.com/v2/portfolio/"
-    V1_PORTFOLIO_ENDPOINT = "https://api.bitsighttech.com/v1/portfolio/"
+    V2_PORTFOLIO_ENDPOINT = "https://api.bitsighttech.com/v2/portfolio"
+    V1_PORTFOLIO_ENDPOINT = "https://api.bitsighttech.com/v1/portfolio"
 
     def __init__(self):
         self.handler = RequestHandler()
