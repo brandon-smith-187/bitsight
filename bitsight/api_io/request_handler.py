@@ -1,4 +1,3 @@
-import datetime
 import os
 import threading
 import time
@@ -11,6 +10,7 @@ import requests
 class Status(Enum):
     okay = (200, "Everything worked as expected")
     success = (201, "The request was successfully submitted")
+    entity_queued = (202, "Entity queued")
     no_authentication = (401, "No valid API token was provided")
     unauthorized = (403, "You do not have permission to access this resource")
     not_found = (404, "The specified resource does not exist")
@@ -22,9 +22,6 @@ class Status(Enum):
         self.code = code
         self.description = description
 
-
-"""Use threading for pagination"""
-THREADED_PAGINATION = True
 
 """Number of seconds in a minute"""
 ONE_MINUTE = 60.0
@@ -52,53 +49,32 @@ BST_API_KEY = "BST_API_KEY"
 def pagination(func):
     """
     Decorator to add to a function to process an endpoint with a paginated return
-    If THREADED_PAGINATION is true, then the pagination is processed by concurrent
-    threds, otherwise it is processed in serial
     :param func: the function to process for paginated output
     :return: total result of all calls as a json
     """
-    from concurrent.futures import ThreadPoolExecutor, as_completed
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         first = func(*args, **kwargs)
         response_json = first.json()
-        results = response_json[RESULTS]
-        count = response_json['count']
-        total_req_number = int(count / 100)
-        if count % 100 != 0:
-            total_req_number += 1
-
-        if THREADED_PAGINATION:
-            params = kwargs.get('params', {})
-            param_list = [{'limit': 100, 'offset': str(n * 100)} for n in range(1, total_req_number)]
-            threads = []
-            max_threads = 3
-            with ThreadPoolExecutor(max_workers=max_threads) as executor:
-                for param in param_list:
-                    param.update(params)
-                    kwargs['params'] = param
-                    kwargs['cookies'] = first.cookies
-                    threads.append(executor.submit(func, *args, **kwargs))
-
-                for task in as_completed(threads):
-                    results.extend(task.result().json()[RESULTS])
-        else:
+        results = response_json.get(RESULTS)
+        if results:
             links = first.json().get(LINKS)
 
             while links.get(NEXT):
-                kwargs['cookies'] = first.cookies
                 kwargs['request_url'] = links.get(NEXT)
                 response = func(*args, **kwargs)
                 links = response.json().get(LINKS)
                 results.extend(response.json()[RESULTS])
 
-        return results
+            return results
+        else:
+            return response_json
 
     return wrapper
 
 
-class RequestHandler:
+class RequestHandler(requests.Session):
     """
     Class for handling calls to the BitSight API
     Uses the singleton design pattern to prevent duplicate instances and to keep the backoff factor
@@ -107,7 +83,6 @@ class RequestHandler:
     factor = 0.0
     GROWTH_FACTOR = 0.3
     base_wait_time = ONE_MINUTE
-    HEADERS = {"Accept": "application/json"}
     _instance = None
     _lock = threading.Lock()
 
@@ -123,48 +98,46 @@ class RequestHandler:
         if self.__initialized:
             return
         self.__initialized = True
+        super().__init__()
         self.api_key = os.environ.get(BST_API_KEY)
-        if self.api_key is None or self.api_key == EMPTY_STRING:
-            self.api_key = input("Please enter your BitSight API Kry: ")
-        self.today = datetime.date.today()
 
-    def get(self, request_url, params=None, headers=None, cookies=None):
-        """
-        Private helper method for wrapping get requests and handling certain status codes
-        :param request_url: the url for the endpoint
-        :param params: parameters for the request (optional)
-        :param headers: headers for the request (optional)
-        :param cookies: cookies for the request (optional)
-        :return: response object
-        """
-        if headers is None:
-            headers = self.HEADERS
+        if self.api_key is None or self.api_key == EMPTY_STRING:
+            self.api_key = input("Please enter your BitSight API Key: ")
+
+        self.auth = (self.api_key, EMPTY_STRING)
+        self.headers.update({"Accept": "application/json"})
+
+    def _bitsight_request(self, method, request_url, **kwargs):
         try:
-            response = requests.get(
+            response = self.request(
+                method,
                 request_url,
-                auth=(self.api_key, EMPTY_STRING),
-                params=params,
-                headers=headers,
-                cookies=cookies
+                **kwargs
             )
 
             while response.status_code == Status.rate_limited.code:
                 retry_after = float(response.headers[RETRY_AFTER])
                 self.back_off(retry_after=retry_after, status_code=response.status_code)
-                response = requests.get(
+                response = self.request(
+                    method,
                     request_url,
-                    auth=(self.api_key, EMPTY_STRING),
-                    params=params,
-                    headers=headers,
+                    **kwargs
+                )
+
+            while response.status_code == Status.entity_queued.code:
+                self.back_off(status_code=response.status_code)
+                response = self.request(
+                    method,
+                    request_url,
+                    **kwargs
                 )
 
             while response.status_code >= Status.server_error.code:
                 self.back_off(status_code=response.status_code)
-                response = requests.get(
+                response = self.request(
+                    method,
                     request_url,
-                    auth=(self.api_key, EMPTY_STRING),
-                    params=params,
-                    headers=headers,
+                    **kwargs
                 )
 
             if response.status_code == Status.unauthorized.code:
@@ -175,11 +148,10 @@ class RequestHandler:
                 print(response.text)
                 # retry once after a period of time
                 self.back_off(status_code=response.status_code)
-                response = requests.get(
+                response = self.request(
+                    method,
                     request_url,
-                    auth=(self.api_key, EMPTY_STRING),
-                    params=params,
-                    headers=headers
+                    **kwargs
                 )
                 # if response after waiting a minute, raise an exception
                 if response.status_code == Status.unauthorized.code:
@@ -196,54 +168,30 @@ class RequestHandler:
         except requests.exceptions.RequestException as request_error:
             print(request_error)
 
-    def post(self, request_url, params=None, json=None, headers=None):
+    @pagination
+    def get(self, request_url, **kwargs):
+        """
+        Private helper method for wrapping get requests and handling certain status codes
+        :param request_url: the url for the endpoint
+        :return: response object
+        """
+        return self._bitsight_request('GET', request_url, **kwargs)
+
+    def post(self, request_url, **kwargs):
         """
         Private method for handling a post request and any needed retries
         :param request_url: the url for the endpoint
-        :param params: parameters for the request (optional)
-        :param json: the json to POST
-        :param headers: headers for the request (optional)
         :return: response object
         """
-        if headers is None:
-            headers = self.HEADERS
-        response = requests.post(request_url, auth=(self.api_key, EMPTY_STRING), params=params, json=json,
-                                 headers=headers)
-        while response.status_code == Status.rate_limited.code:
-            retry_after = float(response.headers[RETRY_AFTER])
-            self.back_off(retry_after=retry_after, status_code=response.status_code)
-            response = requests.post(request_url, auth=(self.api_key, EMPTY_STRING), params=params, json=json,
-                                     headers=headers)
+        return self._bitsight_request('POST', request_url, **kwargs)
 
-        while response.status_code >= Status.server_error.code:
-            self.back_off(status_code=response.status_code)
-            response = requests.post(request_url, auth=(self.api_key, EMPTY_STRING), params=params, json=json,
-                                     headers=headers)
-
-        self.factor = 0.0
-        return response
-
-    def delete(self, request_url, headers=None):
+    def delete(self, request_url, **kwargs):
         """
         Handles delete requests and handles rate limiting
         :param request_url: the url to process for the DELETE request
-        :param headers: the headers for the request
         :return: response object with status code, text, etc.
         """
-        if headers is None:
-            headers = self.HEADERS
-        response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
-        while response.status_code == Status.rate_limited.code:
-            retry_after = float(response.headers[RETRY_AFTER])
-            self.back_off(retry_after=retry_after, status_code=response.status_code)
-            response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
-
-        while response.status_code >= Status.server_error.code:
-            self.back_off(status_code=response.status_code)
-            response = requests.delete(request_url, auth=(self.api_key, EMPTY_STRING), headers=headers)
-
-        self.factor = 0.0
-        return response
+        return self._bitsight_request('DELETE', request_url, **kwargs)
 
     def back_off(self, retry_after=None, status_code=None):
         """
