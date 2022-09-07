@@ -27,7 +27,7 @@ class RapidUnderwriting:
 
     def get_rua_quota(self, **kwargs):
         """
-        Get ratings and risk vectors for a company
-        :return: json representation of the details for the company
+        Get remaining rua licenses
+        :return: json representation of remaining rua licenses
         """
         return self.handler.get(request_url=self.V1_ENDPOINT + 'quota', **kwargs)

@@ -48,3 +48,17 @@ class Subscriptions:
         :return: response object with status code, text, etc.
         """
         return self.handler.delete(request_url=self.V1_ENDPOINT + guid, **kwargs)
+
+    def get_subscription_details(self, **kwargs):
+        """
+        Get subscriptions details
+        :return: json representation of subscriptions details
+        """
+        return self.handler.get(request_url=self.V1_ENDPOINT, **kwargs)
+
+    def get_expired_subscriptions(self, **kwargs):
+        """
+        Get expired subscriptions details
+        :return: json representation of expired subscriptions details
+        """
+        return self.handler.get(request_url=self.V1_ENDPOINT + 'expired', **kwargs)

@@ -1,7 +1,6 @@
-import datetime
 # import pandas
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from pprint import pprint as pp
 
 import bitsight
 
@@ -40,26 +39,28 @@ if __name__ == '__main__':
     # print(f'Max: {max(times)}')
     # print(f'Average: {sum(times, datetime.timedelta())/len(times)}')
 
-    start_time = datetime.datetime.now()
-
-    portfolio = bitsight.Portfolio()
-    companies = bitsight.Companies()
-    portfolio_companies = portfolio.get_portfolio(folder='54dbf2a8-f82c-4fdf-9bf0-ae0080a6774d')
-
-    lst = []
-    max_threads = (
-        3
-    )
-    with ThreadPoolExecutor(max_workers=max_threads) as executor:
-        results = {executor.submit(companies.get_findings, company['guid']): company for company in portfolio_companies}
-
-        for company in as_completed(results.keys()):
-            result = company.result()
-            if result:
-                print(results[company]['name'])
-                # lst.append([result, results[company]])
-
-    # pp(lst)
-
-    end_time = datetime.datetime.now() - start_time
-    print("Execution time: ", end_time, " (hour:minute:second:microsecond)")
+    # start_time = datetime.datetime.now()
+    #
+    # portfolio = bitsight.Portfolio()
+    # companies = bitsight.Companies()
+    # portfolio_companies = portfolio.get_portfolio(folder='54dbf2a8-f82c-4fdf-9bf0-ae0080a6774d')
+    #
+    # lst = []
+    # max_threads = (
+    #     3
+    # )
+    # with ThreadPoolExecutor(max_workers=max_threads) as executor:
+    #     results = {executor.submit(companies.get_findings, company['guid']): company for company in portfolio_companies}
+    #
+    #     for company in as_completed(results.keys()):
+    #         result = company.result()
+    #         if result:
+    #             print(results[company]['name'])
+    #             # lst.append([result, results[company]])
+    #
+    # # pp(lst)
+    #
+    # end_time = datetime.datetime.now() - start_time
+    # print("Execution time: ", end_time, " (hour:minute:second:microsecond)")
+    company_requests = bitsight.CompanyRequests()
+    pp(company_requests.post_request_company('aequo.ua', "continuous_monitoring"))

@@ -59,15 +59,18 @@ def pagination(func):
         response_json = first.json()
         results = response_json.get(RESULTS)
         if results:
-            links = first.json().get(LINKS)
+            try:
+                links = first.json().get(LINKS)
 
-            while links.get(NEXT):
-                kwargs['request_url'] = links.get(NEXT)
-                response = func(*args, **kwargs)
-                links = response.json().get(LINKS)
-                results.extend(response.json()[RESULTS])
+                while links.get(NEXT):
+                    kwargs['request_url'] = links.get(NEXT)
+                    response = func(*args, **kwargs)
+                    links = response.json().get(LINKS)
+                    results.extend(response.json()[RESULTS])
 
-            return results
+                return results
+            except AttributeError:
+                return response_json
         else:
             return response_json
 
@@ -143,19 +146,22 @@ class RequestHandler(requests.Session):
             if response.status_code == Status.unauthorized.code:
                 # added due to odd issue where a 403 was returned and the text content was a html page
                 # suspected to be cloudflare DDoS protection
-                print(response.request.url)
-                print(response.request.headers)
-                print(response.text)
-                # retry once after a period of time
-                self.back_off(status_code=response.status_code)
-                response = self.request(
-                    method,
-                    request_url,
-                    **kwargs
-                )
-                # if response after waiting a minute, raise an exception
-                if response.status_code == Status.unauthorized.code:
-                    raise requests.exceptions.ConnectionError("Random 403 error, output incomplete")
+                response_json = response.json()
+                if response_json.get('detail') is None or response_json.get(
+                        'detail') != "You do not have permission to perform this action.":
+                    print(response.request.url)
+                    print(response.request.headers)
+                    print(response.text)
+                    # retry once after a period of time
+                    self.back_off(status_code=response.status_code)
+                    response = self.request(
+                        method,
+                        request_url,
+                        **kwargs
+                    )
+                    # if response after waiting a minute, raise an exception
+                    if response.status_code == Status.unauthorized.code:
+                        raise requests.exceptions.ConnectionError("Random 403 error, output incomplete")
 
             self.factor = 0.0
             return response

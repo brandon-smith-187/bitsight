@@ -8,7 +8,6 @@ class Companies:
         super().__init__()
         self.handler = RequestHandler()
 
-    # @pagination
     def get_findings(self, guid, params=None, **kwargs):
         """
         Get all findings for a company
