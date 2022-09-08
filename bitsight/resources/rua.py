@@ -22,7 +22,7 @@ class RapidUnderwriting(BitSight):
             "industry": industry
         }
 
-        return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs)
+        return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs).json()
 
     def get_rua_quota(self, **kwargs):
         """

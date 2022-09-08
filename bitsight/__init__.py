@@ -1,5 +1,5 @@
 from .resources.alerts import Alerts
-from .resources.bitsight import BitSight, Endpoints
+from .resources.bitsight import BitSight, Endpoints, Industries
 from .resources.companies import Companies
 from .resources.company_requests import CompanyRequests
 from .resources.portfolio import Portfolio
