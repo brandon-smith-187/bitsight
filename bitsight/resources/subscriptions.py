@@ -1,12 +1,11 @@
-from bitsight.api_io.request_handler import RequestHandler
+from bitsight.resources.bitsight import BitSight
 
 
-class Subscriptions:
-    V1_ENDPOINT = 'https://api.bitsighttech.com/ratings/v1/subscriptions/'
+class Subscriptions(BitSight):
+    V1_ENDPOINT = '/v1/subscriptions/'
 
     def __init__(self):
         super().__init__()
-        self.handler = RequestHandler()
 
     def post_subscribe(self, guid, license_type="continuous_monitoring", **kwargs):
         """
@@ -17,7 +16,7 @@ class Subscriptions:
         """
         payload = {license_type: {"companies": [{"guid": guid}]}}
 
-        return self.handler.post(self.V1_ENDPOINT, json=payload, **kwargs)
+        return self.post(endpoint=self.V1_ENDPOINT, json=payload, **kwargs)
 
     def post_bulk_subscribe(self, guids, license_type="continuous_monitoring", tier=None, folders=None, **kwargs):
         """
@@ -38,7 +37,7 @@ class Subscriptions:
 
             sub_dict["add"].append(company_dict)
         payload = sub_dict
-        response = self.handler.post(self.V1_ENDPOINT + 'bulk', json=payload, **kwargs)
+        response = self.post(endpoint=self.V1_ENDPOINT + 'bulk', json=payload, **kwargs)
         return response
 
     def delete_unsubscribe(self, guid, **kwargs):
@@ -47,18 +46,18 @@ class Subscriptions:
         :param guid: the guid for the company to be unsubscribed from
         :return: response object with status code, text, etc.
         """
-        return self.handler.delete(request_url=self.V1_ENDPOINT + guid, **kwargs)
+        return self.delete(endpoint=self.V1_ENDPOINT + guid, **kwargs)
 
     def get_subscription_details(self, **kwargs):
         """
         Get subscriptions details
         :return: json representation of subscriptions details
         """
-        return self.handler.get(request_url=self.V1_ENDPOINT, **kwargs)
+        return self.get(endpoint=self.V1_ENDPOINT, **kwargs)
 
     def get_expired_subscriptions(self, **kwargs):
         """
         Get expired subscriptions details
         :return: json representation of expired subscriptions details
         """
-        return self.handler.get(request_url=self.V1_ENDPOINT + 'expired', **kwargs)
+        return self.get(endpoint=self.V1_ENDPOINT + 'expired', **kwargs)

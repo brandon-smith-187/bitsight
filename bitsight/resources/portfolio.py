@@ -1,13 +1,12 @@
-from bitsight.api_io.request_handler import RequestHandler
+from bitsight.resources.bitsight import BitSight, Endpoints
 
 
-class Portfolio:
-    V2_ENDPOINT = "https://api.bitsighttech.com/v2/portfolio"
-    V1_ENDPOINT = "https://api.bitsighttech.com/v1/portfolio"
+class Portfolio(BitSight):
+    v2_endpoint = str(Endpoints.V2.portfolio)
+    v1_endpoint = str(Endpoints.V1.portfolio)
 
     def __init__(self):
         super().__init__()
-        self.handler = RequestHandler()
 
     def get_portfolio(self, folder=None, params=None, **kwargs):
         """
@@ -16,14 +15,14 @@ class Portfolio:
         :param params: filters for the request
         :return: json representation of all companies
         """
-        request_url = self.V2_ENDPOINT
+        request_url = self.v2_endpoint
         if folder is not None:
             parameters = {'folder': folder}
         else:
             parameters = {}
         if params is not None:
             parameters.update(params)
-        return self.handler.get(request_url=request_url, params=parameters, **kwargs)
+        return self.get(endpoint=request_url, params=parameters, **kwargs)
 
     def get_infected_companies(self, infections, params=None, **kwargs):
         """
@@ -57,4 +56,4 @@ class Portfolio:
         :param params: filters for the request
         :return: json representation of statistics for your portfolio
         """
-        return self.handler.get(request_url=self.V1_ENDPOINT + 'statistics', params=params, **kwargs)
+        return self.get(endpoint=self.v1_endpoint + 'statistics', params=params, **kwargs)

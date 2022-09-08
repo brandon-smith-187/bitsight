@@ -177,7 +177,7 @@ class RequestHandler(requests.Session):
     @pagination
     def get(self, request_url, **kwargs):
         """
-        Private helper method for wrapping get requests and handling certain status codes
+        method for wrapping get requests and handling certain status codes
         :param request_url: the url for the endpoint
         :return: response object
         """
@@ -185,7 +185,7 @@ class RequestHandler(requests.Session):
 
     def post(self, request_url, **kwargs):
         """
-        Private method for handling a post request and any needed retries
+        method for handling a post request
         :param request_url: the url for the endpoint
         :return: response object
         """
@@ -193,7 +193,7 @@ class RequestHandler(requests.Session):
 
     def delete(self, request_url, **kwargs):
         """
-        Handles delete requests and handles rate limiting
+        method for handling delete requests
         :param request_url: the url to process for the DELETE request
         :return: response object with status code, text, etc.
         """

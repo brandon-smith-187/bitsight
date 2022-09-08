@@ -9,10 +9,15 @@ if __name__ == '__main__':
     dname = os.path.dirname(abspath)
     os.chdir(dname)
 
-    # companies_endpoint = bitsight.Companies()
-    # findings = companies_endpoint.get_findings('97a6a734-b16f-47c2-a3c1-4f08358821a3')
-    # pp(findings)
-    # print(len(findings))
+    companies_endpoint = bitsight.Companies()
+    findings = companies_endpoint.get_findings('97a6a734-b16f-47c2-a3c1-4f08358821a3')
+    pp(findings)
+    print(len(findings))
+    # print(bitsight.Endpoints.V1.portfolio)
+    # print(str(bitsight.Endpoints))
+    # response = bitsight.BitSight().get(bitsight.Endpoints.V1.overview)
+    # pp(response)
+    # print(len(response))
 
     # reports = bitsight.Reports()
     # pdf = reports.post_download_company_report('97a6a734-b16f-47c2-a3c1-4f08358821a3')
@@ -62,5 +67,5 @@ if __name__ == '__main__':
     #
     # end_time = datetime.datetime.now() - start_time
     # print("Execution time: ", end_time, " (hour:minute:second:microsecond)")
-    company_requests = bitsight.CompanyRequests()
-    pp(company_requests.post_request_company('aequo.ua', "continuous_monitoring"))
+    # company_requests = bitsight.CompanyRequests()
+    # pp(company_requests.post_request_company('aequo.ua', "continuous_monitoring"))

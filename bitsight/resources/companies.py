@@ -1,12 +1,11 @@
-from bitsight.api_io.request_handler import RequestHandler
+from bitsight.resources.bitsight import BitSight, Endpoints
 
 
-class Companies:
-    V1_ENDPOINT = "https://api.bitsighttech.com/v1/companies/"
+class Companies(BitSight):
+    v1_endpoint = str(Endpoints.V1.companies)
 
     def __init__(self):
         super().__init__()
-        self.handler = RequestHandler()
 
     def get_findings(self, guid, params=None, **kwargs):
         """
@@ -15,9 +14,9 @@ class Companies:
         :param params: filters for the request
         :return: json representation of all applicable findings
         """
-        request_url = self.V1_ENDPOINT + guid + "/findings"
+        endpoint = self.v1_endpoint + guid + "/findings"
 
-        return self.handler.get(request_url=request_url, params=params, **kwargs)
+        return self.get(endpoint=endpoint, params=params, **kwargs)
 
     def get_company_details(self, guid, params=None, **kwargs):
         """
@@ -26,7 +25,7 @@ class Companies:
         :param params: filters for the request
         :return: json representation of the details for the company
         """
-        return self.handler.get(request_url=self.V1_ENDPOINT + guid, params=params, **kwargs)
+        return self.get(endpoint=self.v1_endpoint + guid, params=params, **kwargs)
 
     def get_company_search(self, domain, params=None, **kwargs):
         """
@@ -35,11 +34,11 @@ class Companies:
         :param params: filters for the request
         :return: json representation of all search results
         """
-        request_url = self.V1_ENDPOINT + "/search"
+        endpoint = self.v1_endpoint + "/search"
 
         if params is None:
             params = {'domain': domain}
         else:
             params.update({'domain': domain})
 
-        return self.handler.get(request_url=request_url, params=params, **kwargs)
+        return self.get(endpoint=endpoint, params=params, **kwargs)

@@ -1,12 +1,11 @@
-from bitsight.api_io.request_handler import RequestHandler
+from bitsight.resources.bitsight import BitSight, Endpoints
 
 
-class Reports:
-    V1_ENDPOINT = 'https://api.bitsighttech.com/v1/reports/'
+class Reports(BitSight):
+    v1_endpoint = str(Endpoints.V1.reports)
 
     def __init__(self):
         super().__init__()
-        self.handler = RequestHandler()
 
     def post_download_company_report(self, guid, file_path='company_report.pdf', **kwargs):
         """
@@ -17,7 +16,7 @@ class Reports:
         json = {"params": {"company": guid}}
         headers = {"Accept": "application/pdf"}
 
-        pdf_reponse = self.handler.post(self.V1_ENDPOINT, json=json, headers=headers, **kwargs)
+        pdf_reponse = self.post(endpoint=self.v1_endpoint, json=json, headers=headers, **kwargs)
 
         with open(file_path, 'wb') as pdf_file:
             pdf_file.write(pdf_reponse.content)

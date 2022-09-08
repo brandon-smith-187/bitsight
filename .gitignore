@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 /test/test-files/
 /hsb.py
+/test.py
+/test/

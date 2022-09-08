@@ -1,12 +1,11 @@
-from bitsight.api_io.request_handler import RequestHandler
+from bitsight.resources.bitsight import BitSight, Endpoints
 
 
-class RapidUnderwriting:
-    V1_ENDPOINT = 'https://api.bitsighttech.com/ratings/v1/fast-ratings/'
+class RapidUnderwriting(BitSight):
+    v1_endpoint = str(Endpoints.V1.fast_ratings)
 
     def __init__(self):
         super().__init__()
-        self.handler = RequestHandler()
 
     def post_request_rua(self, domain, company_name, industry, **kwargs):
         """
@@ -23,11 +22,11 @@ class RapidUnderwriting:
             "industry": industry
         }
 
-        return self.handler.post(self.V1_ENDPOINT, json=payload, **kwargs)
+        return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs)
 
     def get_rua_quota(self, **kwargs):
         """
         Get remaining rua licenses
         :return: json representation of remaining rua licenses
         """
-        return self.handler.get(request_url=self.V1_ENDPOINT + 'quota', **kwargs)
+        return self.get(endpoint=self.v1_endpoint + 'quota', **kwargs)
