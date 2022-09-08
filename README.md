@@ -3,7 +3,7 @@
 This library makes it easy to perform some of the most common BitSight tasks via the BitSight API, while accounting for
 common responses and pagination.
 
-## Official BitSight API Documentation
+## Official BitSight API Documentation:
 
 - [BitSight Knowledge Base API Documentation](https://help.bitsighttech.com/hc/en-us/articles/231872628-API-Documentation-Overview)
 - [v1 Swagger](https://service.bitsighttech.com/customer-api/v1/ui)
@@ -15,12 +15,12 @@ common responses and pagination.
 pip install bitsight
 ```
 
-#### Optional
+#### Optional:
 
 Set your BitSight API Token as an environment variable named BST_API_KEY. Otherwise, you will be prompted to enter your
 api token.
 
-## Example Usage
+## Example Usage:
 
 ```
 import bitsight
@@ -50,7 +50,7 @@ findings = companies.get_findings(guid)
 ### Get risk vectors and rating history
 
 ```
-companh_details = companies.get_company_details(guid)
+company_details = companies.get_company_details(guid)
 ```
 
 ### Download a company report
