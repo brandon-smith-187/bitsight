@@ -16,7 +16,10 @@ class Status(Enum):
     not_found = (404, "The specified resource does not exist")
     rate_limited = (429, "Rate Limit Reached")
     server_error = (500, "Something went wrong on the BitSight end")
-    time_out = (524, "The connection to the web server was successful, but the connection timed out")
+    time_out = (
+        524,
+        "The connection to the web server was successful, but the connection timed out",
+    )
 
     def __init__(self, code, description):
         self.code = code
@@ -63,7 +66,7 @@ def pagination(func):
                 links = first.json().get(LINKS)
 
                 while links.get(NEXT):
-                    kwargs['request_url'] = links.get(NEXT)
+                    kwargs["request_url"] = links.get(NEXT)
                     response = func(*args, **kwargs)
                     links = response.json().get(LINKS)
                     results.extend(response.json()[RESULTS])
@@ -83,6 +86,7 @@ class RequestHandler(requests.Session):
     Uses the singleton design pattern to prevent duplicate instances and to keep the backoff factor
     consistent
     """
+
     factor = 0.0
     GROWTH_FACTOR = 0.3
     base_wait_time = ONE_MINUTE
@@ -112,56 +116,41 @@ class RequestHandler(requests.Session):
 
     def _bitsight_request(self, method, request_url, **kwargs):
         try:
-            response = self.request(
-                method,
-                request_url,
-                **kwargs
-            )
+            response = self.request(method, request_url, **kwargs)
 
             while response.status_code == Status.rate_limited.code:
                 retry_after = float(response.headers[RETRY_AFTER])
                 self.back_off(retry_after=retry_after, status_code=response.status_code)
-                response = self.request(
-                    method,
-                    request_url,
-                    **kwargs
-                )
+                response = self.request(method, request_url, **kwargs)
 
             while response.status_code == Status.entity_queued.code:
                 self.back_off(status_code=response.status_code)
-                response = self.request(
-                    method,
-                    request_url,
-                    **kwargs
-                )
+                response = self.request(method, request_url, **kwargs)
 
             while response.status_code >= Status.server_error.code:
                 self.back_off(status_code=response.status_code)
-                response = self.request(
-                    method,
-                    request_url,
-                    **kwargs
-                )
+                response = self.request(method, request_url, **kwargs)
 
             if response.status_code == Status.unauthorized.code:
                 # added due to odd issue where a 403 was returned and the text content was a html page
                 # suspected to be cloudflare DDoS protection
                 response_json = response.json()
-                if response_json.get('detail') is None or response_json.get(
-                        'detail') != "You do not have permission to perform this action.":
+                if (
+                        response_json.get("detail") is None
+                        or response_json.get("detail")
+                        != "You do not have permission to perform this action."
+                ):
                     print(response.request.url)
                     print(response.request.headers)
                     print(response.text)
                     # retry once after a period of time
                     self.back_off(status_code=response.status_code)
-                    response = self.request(
-                        method,
-                        request_url,
-                        **kwargs
-                    )
+                    response = self.request(method, request_url, **kwargs)
                     # if response after waiting a minute, raise an exception
                     if response.status_code == Status.unauthorized.code:
-                        raise requests.exceptions.ConnectionError("Random 403 error, output incomplete")
+                        raise requests.exceptions.ConnectionError(
+                            "Random 403 error, output incomplete"
+                        )
 
             self.factor = 0.0
             return response
@@ -181,7 +170,7 @@ class RequestHandler(requests.Session):
         :param request_url: the url for the endpoint
         :return: response object
         """
-        return self._bitsight_request('GET', request_url, **kwargs)
+        return self._bitsight_request("GET", request_url, **kwargs)
 
     def post(self, request_url, **kwargs):
         """
@@ -189,7 +178,7 @@ class RequestHandler(requests.Session):
         :param request_url: the url for the endpoint
         :return: response object
         """
-        return self._bitsight_request('POST', request_url, **kwargs)
+        return self._bitsight_request("POST", request_url, **kwargs)
 
     def delete(self, request_url, **kwargs):
         """
@@ -197,7 +186,7 @@ class RequestHandler(requests.Session):
         :param request_url: the url to process for the DELETE request
         :return: response object with status code, text, etc.
         """
-        return self._bitsight_request('DELETE', request_url, **kwargs)
+        return self._bitsight_request("DELETE", request_url, **kwargs)
 
     def back_off(self, retry_after=None, status_code=None):
         """
@@ -205,12 +194,12 @@ class RequestHandler(requests.Session):
         :param retry_after: the period of time specified to retry after (passed from api response)
         :param status_code: the status code of the response (passed from the api response)
         """
-        print(f'Response Code: {status_code}')
+        print(f"Response Code: {status_code}")
         if retry_after is not None:
             self.base_wait_time = retry_after
             wait_time = retry_after * (1.0 + self.factor)
         else:
             wait_time = self.base_wait_time * (1.0 + self.factor)
-        print(f'Error or Rate Limiting: Retrying in {wait_time} seconds')
+        print(f"Error or Rate Limiting: Retrying in {wait_time} seconds")
         self.factor += self.GROWTH_FACTOR
         time.sleep(wait_time)

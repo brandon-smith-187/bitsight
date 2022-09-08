@@ -23,4 +23,4 @@ class Alerts(BitSight):
         :return: json representation of the latest alerts
         """
 
-        return self.get(endpoint=self.v2_endpoint + 'latest', params=params, **kwargs)
+        return self.get(endpoint=self.v2_endpoint + "latest", params=params, **kwargs)

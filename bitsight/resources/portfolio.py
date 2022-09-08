@@ -17,7 +17,7 @@ class Portfolio(BitSight):
         """
         request_url = self.v2_endpoint
         if folder is not None:
-            parameters = {'folder': folder}
+            parameters = {"folder": folder}
         else:
             parameters = {}
         if params is not None:
@@ -31,7 +31,7 @@ class Portfolio(BitSight):
         :param params: filters for the request
         :return: json representation of all companies that are impacted
         """
-        parameters = {'infections': infections}
+        parameters = {"infections": infections}
         if params is not None:
             parameters.update(params)
 
@@ -44,7 +44,7 @@ class Portfolio(BitSight):
         :param params: filters for the request
         :return: json representation of all companies that are impacted
         """
-        parameters = {'vulnerabilities': vulnerabilities}
+        parameters = {"vulnerabilities": vulnerabilities}
         if params is not None:
             parameters.update(params)
 
@@ -56,4 +56,6 @@ class Portfolio(BitSight):
         :param params: filters for the request
         :return: json representation of statistics for your portfolio
         """
-        return self.get(endpoint=self.v1_endpoint + 'statistics', params=params, **kwargs)
+        return self.get(
+            endpoint=self.v1_endpoint + "statistics", params=params, **kwargs
+        )

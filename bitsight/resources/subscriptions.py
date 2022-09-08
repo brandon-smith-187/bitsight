@@ -2,7 +2,7 @@ from bitsight.resources.bitsight import BitSight
 
 
 class Subscriptions(BitSight):
-    V1_ENDPOINT = '/v1/subscriptions/'
+    V1_ENDPOINT = "/v1/subscriptions/"
 
     def __init__(self):
         super().__init__()
@@ -18,7 +18,14 @@ class Subscriptions(BitSight):
 
         return self.post(endpoint=self.V1_ENDPOINT, json=payload, **kwargs)
 
-    def post_bulk_subscribe(self, guids, license_type="continuous_monitoring", tier=None, folders=None, **kwargs):
+    def post_bulk_subscribe(
+            self,
+            guids,
+            license_type="continuous_monitoring",
+            tier=None,
+            folders=None,
+            **kwargs
+    ):
         """
         Request to subscribe to multiple companies in BitSight
         :param guids: list of guids to subscribe to
@@ -37,7 +44,7 @@ class Subscriptions(BitSight):
 
             sub_dict["add"].append(company_dict)
         payload = sub_dict
-        response = self.post(endpoint=self.V1_ENDPOINT + 'bulk', json=payload, **kwargs)
+        response = self.post(endpoint=self.V1_ENDPOINT + "bulk", json=payload, **kwargs)
         return response
 
     def delete_unsubscribe(self, guid, **kwargs):
@@ -60,4 +67,4 @@ class Subscriptions(BitSight):
         Get expired subscriptions details
         :return: json representation of expired subscriptions details
         """
-        return self.get(endpoint=self.V1_ENDPOINT + 'expired', **kwargs)
+        return self.get(endpoint=self.V1_ENDPOINT + "expired", **kwargs)

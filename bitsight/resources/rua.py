@@ -19,7 +19,7 @@ class RapidUnderwriting(BitSight):
             "company": company_name,
             "url": domain,
             "generate_report": "true",
-            "industry": industry
+            "industry": industry,
         }
 
         return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs).json()
@@ -29,4 +29,4 @@ class RapidUnderwriting(BitSight):
         Get remaining rua licenses
         :return: json representation of remaining rua licenses
         """
-        return self.get(endpoint=self.v1_endpoint + 'quota', **kwargs)
+        return self.get(endpoint=self.v1_endpoint + "quota", **kwargs)

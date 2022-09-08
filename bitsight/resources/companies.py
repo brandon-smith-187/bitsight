@@ -37,8 +37,8 @@ class Companies(BitSight):
         endpoint = self.v1_endpoint + "/search"
 
         if params is None:
-            params = {'domain': domain}
+            params = {"domain": domain}
         else:
-            params.update({'domain': domain})
+            params.update({"domain": domain})
 
         return self.get(endpoint=endpoint, params=params, **kwargs)
