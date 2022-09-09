@@ -35,6 +35,17 @@ class BitSight:
         """
         return self._handler.delete(request_url=f"{self._BASE_URL}{endpoint}", **kwargs)
 
+    def patch(self, endpoint, json, **kwargs):
+        """
+        method for handling a patch request
+        :param json: the payload to patch
+        :param endpoint: the url for the endpoint
+        :return: response object
+        """
+        return self._handler.patch(
+            request_url=f"{self._BASE_URL}{endpoint}", json=json, **kwargs
+        )
+
 
 class Endpoints:
     """

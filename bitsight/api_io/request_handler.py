@@ -188,6 +188,14 @@ class RequestHandler(requests.Session):
         """
         return self._bitsight_request("DELETE", request_url, **kwargs)
 
+    def patch(self, request_url, **kwargs):
+        """
+        method for handling a patch request
+        :param request_url: the url for the endpoint
+        :return: response object
+        """
+        return self._bitsight_request("PATCH", request_url, **kwargs)
+
     def back_off(self, retry_after=None, status_code=None):
         """
         Method for handling a retry as well as raising the backoff factor
