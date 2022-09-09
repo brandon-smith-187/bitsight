@@ -8,5 +8,10 @@ setup(
     license='MIT',
     author='Brandon Smith',
     author_email='bcsmith2@gmail.com',
-    description='Unofficial Package for BitSight\'s API'
+    description='Unofficial Package for BitSight\'s API',
+    python_requires='>=3.7',
+    py_modules=["quicksample"],
+    install_requires=[
+        'requests',
+    ],
 )
