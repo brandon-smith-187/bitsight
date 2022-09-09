@@ -92,6 +92,7 @@ class Industries(Enum):
     """
     Enumeration representing the available industry names
     """
+
     aerospacedefense = "Aerospace/Defense"
     aviation_aerospace = "Aviation & Aerospace"
     defense_space = "Defense & Space"
@@ -266,6 +267,7 @@ class RiskVectors(Enum):
     """
     Enumeration representing the slugs for BitSight risk vectors for use with our api
     """
+
     botnet_infections = "botnet_infections"
     spam_propagation = "spam_propagation"
     malware_servers = "malware_servers"
@@ -302,10 +304,11 @@ class Severity(Enum):
     """
     Enumeration representing the BitSight finding severity values
     """
-    minor = 'minor'
-    moderate = 'moderate'
-    material = 'material'
-    severe = 'severe'
+
+    minor = "minor"
+    moderate = "moderate"
+    material = "material"
+    severe = "severe"
 
     def __init__(self, severity_slug):
         self.severity_slug = severity_slug
@@ -321,12 +324,13 @@ class FindingGrade(Enum):
     """
     Enumeration representing the BitSight finding grade values
     """
-    good = 'good'
-    fair = 'fair'
-    warn = 'warn'
-    bad = 'bad'
-    neutral = 'neutral'
-    na = 'na'
+
+    good = "good"
+    fair = "fair"
+    warn = "warn"
+    bad = "bad"
+    neutral = "neutral"
+    na = "na"
 
     def __init__(self, grade_slug):
         self.grade_slug = grade_slug
@@ -342,11 +346,12 @@ class AssetImportance(Enum):
     """
     Enumeration representing the BitSight asset importance values
     """
-    low = 'low'
-    medium = 'medium'
-    high = 'high'
-    critical = 'critical'
-    null = 'null'
+
+    low = "low"
+    medium = "medium"
+    high = "high"
+    critical = "critical"
+    null = "null"
 
     def __init__(self, importance_slug):
         self.importance_slug = importance_slug
@@ -362,14 +367,15 @@ class LicenseType(Enum):
     """
     Enumeration representing the BitSight licence types
     """
-    alerts_only = 'alerts-only'
-    applicants = 'applicants'
-    continuous_monitoring = 'continuous_monitoring'
-    countries = 'countries'
-    insureds = 'continuous_monitoring'
-    my_subsidiary = 'my_subsidiary'
-    one_time = 'one-time'
-    vendor_selection = 'vendor-selection'
+
+    alerts_only = "alerts-only"
+    applicants = "applicants"
+    continuous_monitoring = "continuous_monitoring"
+    countries = "countries"
+    insureds = "continuous_monitoring"
+    my_subsidiary = "my_subsidiary"
+    one_time = "one-time"
+    vendor_selection = "vendor-selection"
 
     def __init__(self, license_slug):
         self.license_slug = license_slug

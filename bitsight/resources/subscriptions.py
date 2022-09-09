@@ -24,7 +24,7 @@ class Subscriptions(BitSight):
             license_type="continuous_monitoring",
             tier=None,
             folders=None,
-            **kwargs
+            **kwargs,
     ):
         """
         Request to subscribe to multiple companies in BitSight

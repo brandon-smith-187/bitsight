@@ -1,6 +1,14 @@
 from .resources.alerts import Alerts
-from .resources.bitsight import BitSight, Endpoints, Industries, RiskVectors, Severity, FindingGrade, AssetImportance, \
-    LicenseType
+from .resources.bitsight import (
+    BitSight,
+    Endpoints,
+    Industries,
+    RiskVectors,
+    Severity,
+    FindingGrade,
+    AssetImportance,
+    LicenseType,
+)
 from .resources.companies import Companies
 from .resources.company_requests import CompanyRequests
 from .resources.portfolio import Portfolio
