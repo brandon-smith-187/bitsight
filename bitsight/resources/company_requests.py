@@ -2,7 +2,7 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class CompanyRequests(BitSight):
-    v2_endpoint = str(Endpoints.V2.company_requests)
+    v2_endpoint = f"{Endpoints.V2.company_requests}"
 
     def __init__(self):
         super().__init__()
@@ -34,7 +34,7 @@ class CompanyRequests(BitSight):
         :return: json confirmation
         """
         if subscription_type is not None:
-            payload = {"domain": domain, "subscription_type": subscription_type}
+            payload = {"domain": domain, "subscription_type": f"{subscription_type}"}
         else:
             payload = {"domain": domain}
 

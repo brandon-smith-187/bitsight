@@ -38,7 +38,7 @@ search_results = companies.get_company_search('example.com')
 ```
 guid = search_results[0]['guid']
 subscriptions = bitsight.Subscriptions()
-subscribe_result = subscriptions.post_subscribe(guid)
+subscribe_result = subscriptions.post_subscribe(guid, bitsight.LicenseType.continuous_monitoring)
 ```
 
 ### Get findings for a company
@@ -71,7 +71,7 @@ company_request_response = company_requests.post_request_company('example.com')
 
 ```
 rua = bitsight.RapidUnderwriting()
-fast_ratings_report = rua.post_request_rua(domain='example.com', company_name='Example', industry=str(bitsight.Industries.technology))
+fast_ratings_report = rua.post_request_rua(domain='example.com', company_name='Example', industry=bitsight.Industries.technology)
 ```
 
 ### Get all companies in your portfolio

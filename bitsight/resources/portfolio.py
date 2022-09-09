@@ -2,8 +2,8 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class Portfolio(BitSight):
-    v2_endpoint = str(Endpoints.V2.portfolio)
-    v1_endpoint = str(Endpoints.V1.portfolio)
+    v2_endpoint = f"{Endpoints.V2.portfolio}"
+    v1_endpoint = f"{Endpoints.V1.portfolio}"
 
     def __init__(self):
         super().__init__()

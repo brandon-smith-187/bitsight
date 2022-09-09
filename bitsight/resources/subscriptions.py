@@ -1,8 +1,8 @@
-from bitsight.resources.bitsight import BitSight
+from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class Subscriptions(BitSight):
-    V1_ENDPOINT = "/v1/subscriptions/"
+    v1_endpoint = f"{Endpoints.V1.subscriptions}"
 
     def __init__(self):
         super().__init__()
@@ -14,9 +14,9 @@ class Subscriptions(BitSight):
         :param license_type: the license to use for the subscription
         :return: response object with confirmation in the content
         """
-        payload = {license_type: {"companies": [{"guid": guid}]}}
+        payload = {f"{license_type}": {"companies": [{"guid": guid}]}}
 
-        return self.post(endpoint=self.V1_ENDPOINT, json=payload, **kwargs)
+        return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs).json()
 
     def post_bulk_subscribe(
             self,
@@ -36,7 +36,7 @@ class Subscriptions(BitSight):
         """
         sub_dict = {"add": []}
         for guid in guids:
-            company_dict = {"guid": guid, "type": license_type}
+            company_dict = {"guid": guid, "type": f"{license_type}"}
             if tier is not None:
                 company_dict.update({"tier": tier})
             if folders is not None:
@@ -44,7 +44,7 @@ class Subscriptions(BitSight):
 
             sub_dict["add"].append(company_dict)
         payload = sub_dict
-        response = self.post(endpoint=self.V1_ENDPOINT + "bulk", json=payload, **kwargs)
+        response = self.post(endpoint=self.v1_endpoint + "bulk", json=payload, **kwargs)
         return response
 
     def delete_unsubscribe(self, guid, **kwargs):
@@ -53,18 +53,18 @@ class Subscriptions(BitSight):
         :param guid: the guid for the company to be unsubscribed from
         :return: response object with status code, text, etc.
         """
-        return self.delete(endpoint=self.V1_ENDPOINT + guid, **kwargs)
+        return self.delete(endpoint=self.v1_endpoint + guid, **kwargs)
 
     def get_subscription_details(self, **kwargs):
         """
         Get subscriptions details
         :return: json representation of subscriptions details
         """
-        return self.get(endpoint=self.V1_ENDPOINT, **kwargs)
+        return self.get(endpoint=self.v1_endpoint, **kwargs)
 
     def get_expired_subscriptions(self, **kwargs):
         """
         Get expired subscriptions details
         :return: json representation of expired subscriptions details
         """
-        return self.get(endpoint=self.V1_ENDPOINT + "expired", **kwargs)
+        return self.get(endpoint=self.v1_endpoint + "expired", **kwargs)

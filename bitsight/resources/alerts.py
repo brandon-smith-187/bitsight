@@ -2,7 +2,7 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class Alerts(BitSight):
-    v2_endpoint = str(Endpoints.V2.alerts)
+    v2_endpoint = f"{Endpoints.V2.alerts}"
 
     def __init__(self):
         super().__init__()

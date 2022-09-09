@@ -37,6 +37,10 @@ class BitSight:
 
 
 class Endpoints:
+    """
+    Enumeration representing the available v1 and v2 endpoints
+    """
+
     class V1(Enum):
         overview = ""
         enable_vendor_access = "access-requests/"
@@ -64,6 +68,9 @@ class Endpoints:
         def __str__(self):
             return f"{self.__class__.__name__.lower()}/{self.path}"
 
+        def __repr__(self):
+            return f"{self.__class__.__name__.lower()}/{self.path}"
+
     class V2(Enum):
         overview = ""
         alerts = "alerts/"
@@ -77,8 +84,14 @@ class Endpoints:
         def __str__(self):
             return f"{self.__class__.__name__.lower()}/{self.path}"
 
+        def __repr__(self):
+            return f"{self.__class__.__name__.lower()}/{self.path}"
+
 
 class Industries(Enum):
+    """
+    Enumeration representing the available industry names
+    """
     aerospacedefense = "Aerospace/Defense"
     aviation_aerospace = "Aviation & Aerospace"
     defense_space = "Defense & Space"
@@ -244,3 +257,125 @@ class Industries(Enum):
 
     def __str__(self):
         return f"{self.value}"
+
+    def __repr__(self):
+        return f"{self.value}"
+
+
+class RiskVectors(Enum):
+    """
+    Enumeration representing the slugs for BitSight risk vectors for use with our api
+    """
+    botnet_infections = "botnet_infections"
+    spam_propagation = "spam_propagation"
+    malware_servers = "malware_servers"
+    unsolicited_comm = "unsolicited_comm"
+    potentially_exploited = "potentially_exploited"
+    spf = "spf"
+    dkim = "dkim"
+    ssl_certificates = "ssl_certificates"
+    ssl_configurations = "ssl_configurations"
+    open_ports = "open_ports"
+    dnssec = "dnssec"
+    application_security = "application_security"
+    patching_cadence = "patching_cadence"
+    insecure_systems = "insecure_systems"
+    server_software = "server_software"
+    desktop_software = "desktop_software"
+    mobile_software = "mobile_software"
+    mobile_application_security = "mobile_application_security"
+    data_breaches = "data_breaches"
+    exposed_credentials = "exposed_credentials"
+    file_sharing = "file_sharing"
+
+    def __init__(self, risk_vector_slug):
+        self.risk_vector_slug = risk_vector_slug
+
+    def __str__(self):
+        return f"{self.risk_vector_slug}"
+
+    def __repr__(self):
+        return f"{self.risk_vector_slug}"
+
+
+class Severity(Enum):
+    """
+    Enumeration representing the BitSight finding severity values
+    """
+    minor = 'minor'
+    moderate = 'moderate'
+    material = 'material'
+    severe = 'severe'
+
+    def __init__(self, severity_slug):
+        self.severity_slug = severity_slug
+
+    def __str__(self):
+        return f"{self.severity_slug}"
+
+    def __repr__(self):
+        return f"{self.severity_slug}"
+
+
+class FindingGrade(Enum):
+    """
+    Enumeration representing the BitSight finding grade values
+    """
+    good = 'good'
+    fair = 'fair'
+    warn = 'warn'
+    bad = 'bad'
+    neutral = 'neutral'
+    na = 'na'
+
+    def __init__(self, grade_slug):
+        self.grade_slug = grade_slug
+
+    def __str__(self):
+        return f"{self.grade_slug}"
+
+    def __repr__(self):
+        return f"{self.grade_slug}"
+
+
+class AssetImportance(Enum):
+    """
+    Enumeration representing the BitSight asset importance values
+    """
+    low = 'low'
+    medium = 'medium'
+    high = 'high'
+    critical = 'critical'
+    null = 'null'
+
+    def __init__(self, importance_slug):
+        self.importance_slug = importance_slug
+
+    def __str__(self):
+        return f"{self.importance_slug}"
+
+    def __repr__(self):
+        return f"{self.importance_slug}"
+
+
+class LicenseType(Enum):
+    """
+    Enumeration representing the BitSight licence types
+    """
+    alerts_only = 'alerts-only'
+    applicants = 'applicants'
+    continuous_monitoring = 'continuous_monitoring'
+    countries = 'countries'
+    insureds = 'continuous_monitoring'
+    my_subsidiary = 'my_subsidiary'
+    one_time = 'one-time'
+    vendor_selection = 'vendor-selection'
+
+    def __init__(self, license_slug):
+        self.license_slug = license_slug
+
+    def __str__(self):
+        return f"{self.license_slug}"
+
+    def __repr__(self):
+        return f"{self.license_slug}"

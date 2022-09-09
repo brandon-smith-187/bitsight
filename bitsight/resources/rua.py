@@ -2,7 +2,7 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class RapidUnderwriting(BitSight):
-    v1_endpoint = str(Endpoints.V1.fast_ratings)
+    v1_endpoint = f"{Endpoints.V1.fast_ratings}"
 
     def __init__(self):
         super().__init__()
@@ -19,7 +19,7 @@ class RapidUnderwriting(BitSight):
             "company": company_name,
             "url": domain,
             "generate_report": "true",
-            "industry": industry,
+            "industry": f"{industry}",
         }
 
         return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs).json()

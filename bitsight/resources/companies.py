@@ -2,7 +2,7 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 
 
 class Companies(BitSight):
-    v1_endpoint = str(Endpoints.V1.companies)
+    v1_endpoint = f"{Endpoints.V1.companies}"
 
     def __init__(self):
         super().__init__()
