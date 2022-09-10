@@ -10,7 +10,7 @@ setup(
     author_email='bcsmith2@gmail.com',
     description='Unofficial Package for BitSight\'s API',
     python_requires='>=3.7',
-    py_modules=["quicksample"],
+    py_modules=["bitsight"],
     install_requires=[
         'requests',
     ],
