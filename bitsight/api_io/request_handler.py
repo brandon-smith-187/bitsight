@@ -3,6 +3,7 @@ import threading
 import time
 from enum import Enum
 from functools import wraps
+import logging
 
 import requests
 
@@ -113,6 +114,7 @@ class RequestHandler(requests.Session):
 
         self.auth = (self.api_key, EMPTY_STRING)
         self.headers.update({"Accept": "application/json"})
+        logging.basicConfig(level=logging.INFO)
 
     def _bitsight_request(self, method, request_url, **kwargs):
         try:
@@ -140,9 +142,9 @@ class RequestHandler(requests.Session):
                         or response_json.get("detail")
                         != "You do not have permission to perform this action."
                 ):
-                    print(response.request.url)
-                    print(response.request.headers)
-                    print(response.text)
+                    logging.info(f"Request URL: {response.request.url}")
+                    logging.info(f"Request Headers: {response.request.headers}")
+                    logging.info(f"Response Text: {response.text}")
                     # retry once after a period of time
                     self.back_off(status_code=response.status_code)
                     response = self.request(method, request_url, **kwargs)
@@ -155,13 +157,13 @@ class RequestHandler(requests.Session):
             self.factor = 0.0
             return response
         except requests.exceptions.HTTPError as http_error:
-            print(http_error)
+            logging.error(str(http_error))
         except requests.exceptions.ConnectionError as connection_error:
-            print(connection_error)
+            logging.error(str(connection_error))
         except requests.exceptions.Timeout as timeout_error:
-            print(timeout_error)
+            logging.error(str(timeout_error))
         except requests.exceptions.RequestException as request_error:
-            print(request_error)
+            logging.error(str(request_error))
 
     @pagination
     def get(self, request_url, **kwargs):
@@ -202,12 +204,12 @@ class RequestHandler(requests.Session):
         :param retry_after: the period of time specified to retry after (passed from api response)
         :param status_code: the status code of the response (passed from the api response)
         """
-        print(f"Response Code: {status_code}")
+        logging.info(f"Response Code: {status_code}")
         if retry_after is not None:
             self.base_wait_time = retry_after
             wait_time = retry_after * (1.0 + self.factor)
         else:
             wait_time = self.base_wait_time * (1.0 + self.factor)
-        print(f"Error or Rate Limiting: Retrying in {wait_time} seconds")
+        logging.info(f"Error or Rate Limiting: Retrying in {wait_time} seconds")
         self.factor += self.GROWTH_FACTOR
         time.sleep(wait_time)
