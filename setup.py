@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='bitsight',
-    version='0.2.1',
+    version='0.2.2',
     packages=['bitsight', 'bitsight.api_io', 'bitsight.resources'],
     url='https://github.com/brandon-smith-187/bitsight',
     license='MIT',
