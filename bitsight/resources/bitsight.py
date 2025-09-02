@@ -300,6 +300,7 @@ class RiskVectors(Enum):
     data_breaches = "data_breaches"
     exposed_credentials = "exposed_credentials"
     file_sharing = "file_sharing"
+    web_appsec = "web_appsec"
 
     def __init__(self, risk_vector_slug):
         self.risk_vector_slug = risk_vector_slug
