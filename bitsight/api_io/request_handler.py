@@ -22,7 +22,7 @@ class Status(Enum):
         "The connection to the web server was successful, but the connection timed out",
     )
 
-    def __init__(self, code, description):
+    def __init__(self, code: int, description: str):
         self.code = code
         self.description = description
 
@@ -102,12 +102,15 @@ class RequestHandler(requests.Session):
                     cls._instance.__initialized = False
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, api_key: str | None = None):
         if self.__initialized:
             return
         self.__initialized = True
         super().__init__()
-        self.api_key = os.environ.get(BST_API_KEY)
+        if api_key:
+            self.api_key = api_key
+        else:
+            self.api_key = os.environ.get(BST_API_KEY)
 
         if self.api_key is None or self.api_key == EMPTY_STRING:
             self.api_key = input("Please enter your BitSight API Key: ")
@@ -116,7 +119,7 @@ class RequestHandler(requests.Session):
         self.headers.update({"Accept": "application/json"})
         logging.basicConfig(level=logging.INFO)
 
-    def _bitsight_request(self, method, request_url, **kwargs):
+    def _bitsight_request(self, method: str, request_url: str, **kwargs):
         try:
             response = self.request(method, request_url, **kwargs)
 
@@ -138,9 +141,9 @@ class RequestHandler(requests.Session):
                 # suspected to be cloudflare DDoS protection
                 response_json = response.json()
                 if (
-                        response_json.get("detail") is None
-                        or response_json.get("detail")
-                        != "You do not have permission to perform this action."
+                    response_json.get("detail") is None
+                    or response_json.get("detail")
+                    != "You do not have permission to perform this action."
                 ):
                     logging.info(f"Request URL: {response.request.url}")
                     logging.info(f"Request Headers: {response.request.headers}")
@@ -166,7 +169,7 @@ class RequestHandler(requests.Session):
             logging.error(str(request_error))
 
     @pagination
-    def get(self, request_url, **kwargs):
+    def get(self, request_url: str, **kwargs):
         """
         method for wrapping get requests and handling certain status codes
         :param request_url: the url for the endpoint
@@ -174,7 +177,7 @@ class RequestHandler(requests.Session):
         """
         return self._bitsight_request("GET", request_url, **kwargs)
 
-    def post(self, request_url, **kwargs):
+    def post(self, request_url: str, **kwargs):
         """
         method for handling a post request
         :param request_url: the url for the endpoint
@@ -182,7 +185,7 @@ class RequestHandler(requests.Session):
         """
         return self._bitsight_request("POST", request_url, **kwargs)
 
-    def delete(self, request_url, **kwargs):
+    def delete(self, request_url: str, **kwargs):
         """
         method for handling delete requests
         :param request_url: the url to process for the DELETE request
@@ -190,7 +193,7 @@ class RequestHandler(requests.Session):
         """
         return self._bitsight_request("DELETE", request_url, **kwargs)
 
-    def patch(self, request_url, **kwargs):
+    def patch(self, request_url: str, **kwargs):
         """
         method for handling a patch request
         :param request_url: the url for the endpoint
@@ -198,7 +201,7 @@ class RequestHandler(requests.Session):
         """
         return self._bitsight_request("PATCH", request_url, **kwargs)
 
-    def back_off(self, retry_after=None, status_code=None):
+    def back_off(self, retry_after: float | None = None, status_code=None):
         """
         Method for handling a retry as well as raising the backoff factor
         :param retry_after: the period of time specified to retry after (passed from api response)

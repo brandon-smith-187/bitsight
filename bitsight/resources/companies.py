@@ -42,7 +42,7 @@ class Companies(BitSight):
             params.update({"domain": domain})
 
         return self.get(endpoint=endpoint, params=params, **kwargs)
-        
+
     def get_assets(self, guid, params=None, **kwargs):
         """
         Get a company's asset information (domains and IP addresses)
@@ -51,5 +51,5 @@ class Companies(BitSight):
         :return: json representation of the search results
         """
         endpoint = self.v1_endpoint + guid + "/assets"
-        
+
         return self.get(endpoint=endpoint, params=params, **kwargs)
