@@ -4,10 +4,10 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 class Alerts(BitSight):
     v2_endpoint = f"{Endpoints.V2.alerts}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
-    def get_alerts(self, params=None, **kwargs):
+    def get_alerts(self, params: dict[str, str] | None = None, **kwargs):
         """
         Get all alerts
         :param params: filters for the request
@@ -16,7 +16,7 @@ class Alerts(BitSight):
 
         return self.get(endpoint=self.v2_endpoint, params=params, **kwargs)
 
-    def get_latest_alerts(self, params=None, **kwargs):
+    def get_latest_alerts(self, params: dict[str, str] | None = None, **kwargs):
         """
         Get the latest alerts
         :param params: filters for the request
