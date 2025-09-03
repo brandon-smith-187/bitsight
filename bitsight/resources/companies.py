@@ -1,13 +1,13 @@
-from bitsight.resources.bitsight import BitSight, Endpoints
+from bitsight.resources.bitsight import BitSight, Endpoints, QueryParams
 
 
 class Companies(BitSight):
     v1_endpoint = f"{Endpoints.V1.companies}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
-    def get_findings(self, guid, params=None, **kwargs):
+    def get_findings(self, guid: str, params: QueryParams = None, **kwargs):
         """
         Get all findings for a company
         :param guid: the BitSight guid for the company
@@ -18,7 +18,7 @@ class Companies(BitSight):
 
         return self.get(endpoint=endpoint, params=params, **kwargs)
 
-    def get_company_details(self, guid, params=None, **kwargs):
+    def get_company_details(self, guid: str, params: QueryParams = None, **kwargs):
         """
         Get ratings and risk vectors for a company
         :param guid: the BitSight guid for the company
@@ -27,7 +27,7 @@ class Companies(BitSight):
         """
         return self.get(endpoint=self.v1_endpoint + guid, params=params, **kwargs)
 
-    def get_company_search(self, domain, params=None, **kwargs):
+    def get_company_search(self, domain: str, params: QueryParams = None, **kwargs):
         """
         Search for a company based on a provided domain
         :param domain: the domain to search based on
@@ -43,7 +43,7 @@ class Companies(BitSight):
 
         return self.get(endpoint=endpoint, params=params, **kwargs)
 
-    def get_assets(self, guid, params=None, **kwargs):
+    def get_assets(self, guid: str, params: QueryParams = None, **kwargs):
         """
         Get a company's asset information (domains and IP addresses)
         :param guid: the BitSight guid for the company

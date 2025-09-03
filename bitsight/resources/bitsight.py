@@ -1,6 +1,11 @@
 from enum import Enum
+from typing import Any, Dict
 
 from bitsight.api_io.request_handler import RequestHandler
+
+
+QueryParams = Dict[str, Any] | None
+Payload = Dict[str, Any]
 
 
 class BitSight:
@@ -16,7 +21,7 @@ class BitSight:
         """
         return self._handler.get(request_url=f"{self._BASE_URL}{endpoint}", **kwargs)
 
-    def post(self, endpoint: str, json: dict[str, str], **kwargs):
+    def post(self, endpoint: str, json: Payload, **kwargs):
         """
         method for handling a post request
         :param json: the payload to post
@@ -35,7 +40,7 @@ class BitSight:
         """
         return self._handler.delete(request_url=f"{self._BASE_URL}{endpoint}", **kwargs)
 
-    def patch(self, endpoint: str, json: dict[str, str], **kwargs):
+    def patch(self, endpoint: str, json: Payload, **kwargs):
         """
         method for handling a patch request
         :param json: the payload to patch
