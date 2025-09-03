@@ -4,10 +4,10 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 class RapidUnderwriting(BitSight):
     v1_endpoint = f"{Endpoints.V1.fast_ratings}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
-    def post_request_rua(self, domain, company_name, industry, **kwargs):
+    def post_request_rua(self, domain: str, company_name: str, industry: str, **kwargs):
         """
         Request to subscribe to a company in BitSight
         :param industry: industry for the company
