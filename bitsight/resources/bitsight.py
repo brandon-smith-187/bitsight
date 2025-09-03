@@ -4,11 +4,11 @@ from bitsight.api_io.request_handler import RequestHandler
 
 
 class BitSight:
-    def __init__(self):
-        self._handler = RequestHandler()
+    def __init__(self, api_key: str | None = None):
+        self._handler = RequestHandler(api_key)
         self._BASE_URL = "https://api.bitsighttech.com/"
 
-    def get(self, endpoint, **kwargs):
+    def get(self, endpoint: str, **kwargs):
         """
         method for wrapping get requests and handling certain status codes
         :param endpoint: the url for the endpoint
@@ -16,7 +16,7 @@ class BitSight:
         """
         return self._handler.get(request_url=f"{self._BASE_URL}{endpoint}", **kwargs)
 
-    def post(self, endpoint, json, **kwargs):
+    def post(self, endpoint: str, json: dict(str, str), **kwargs):
         """
         method for handling a post request
         :param json: the payload to post
@@ -27,7 +27,7 @@ class BitSight:
             request_url=f"{self._BASE_URL}{endpoint}", json=json, **kwargs
         )
 
-    def delete(self, endpoint, **kwargs):
+    def delete(self, endpoint: str, **kwargs):
         """
         method for handling delete requests
         :param endpoint: the url to process for the DELETE request
@@ -35,7 +35,7 @@ class BitSight:
         """
         return self._handler.delete(request_url=f"{self._BASE_URL}{endpoint}", **kwargs)
 
-    def patch(self, endpoint, json, **kwargs):
+    def patch(self, endpoint: str, json: dict(str, str), **kwargs):
         """
         method for handling a patch request
         :param json: the payload to patch
@@ -73,7 +73,7 @@ class Endpoints:
         territories = "territories/"
         tiers = "tiers/"
 
-        def __init__(self, path):
+        def __init__(self, path: str):
             self.path = path
 
         def __str__(self):
@@ -89,7 +89,7 @@ class Endpoints:
         portfolio = "portfolio/"
         users = "users/"
 
-        def __init__(self, path):
+        def __init__(self, path: str):
             self.path = path
 
         def __str__(self):
@@ -302,7 +302,7 @@ class RiskVectors(Enum):
     file_sharing = "file_sharing"
     web_appsec = "web_appsec"
 
-    def __init__(self, risk_vector_slug):
+    def __init__(self, risk_vector_slug: str):
         self.risk_vector_slug = risk_vector_slug
 
     def __str__(self):
@@ -322,7 +322,7 @@ class Severity(Enum):
     material = "material"
     severe = "severe"
 
-    def __init__(self, severity_slug):
+    def __init__(self, severity_slug: str):
         self.severity_slug = severity_slug
 
     def __str__(self):
@@ -344,7 +344,7 @@ class FindingGrade(Enum):
     neutral = "neutral"
     na = "na"
 
-    def __init__(self, grade_slug):
+    def __init__(self, grade_slug: str):
         self.grade_slug = grade_slug
 
     def __str__(self):
@@ -365,7 +365,7 @@ class AssetImportance(Enum):
     critical = "critical"
     null = "null"
 
-    def __init__(self, importance_slug):
+    def __init__(self, importance_slug: str):
         self.importance_slug = importance_slug
 
     def __str__(self):
@@ -389,7 +389,7 @@ class LicenseType(Enum):
     one_time = "one-time"
     vendor_selection = "vendor-selection"
 
-    def __init__(self, license_slug):
+    def __init__(self, license_slug: str):
         self.license_slug = license_slug
 
     def __str__(self):
