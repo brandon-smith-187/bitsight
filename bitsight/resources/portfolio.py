@@ -1,14 +1,16 @@
-from bitsight.resources.bitsight import BitSight, Endpoints
+from bitsight.resources.bitsight import BitSight, Endpoints, QueryParams
 
 
 class Portfolio(BitSight):
     v2_endpoint = f"{Endpoints.V2.portfolio}"
     v1_endpoint = f"{Endpoints.V1.portfolio}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
-    def get_portfolio(self, folder=None, params=None, **kwargs):
+    def get_portfolio(
+        self, folder: str | None = None, params: QueryParams = None, **kwargs
+    ):
         """
         Get all companies in your portfolio
         :param folder: guid for the folder containing the companies
@@ -24,7 +26,9 @@ class Portfolio(BitSight):
             parameters.update(params)
         return self.get(endpoint=request_url, params=parameters, **kwargs)
 
-    def get_infected_companies(self, infections, params=None, **kwargs):
+    def get_infected_companies(
+        self, infections: str, params: QueryParams = None, **kwargs
+    ):
         """
         Get all companies in your portfolio impacted by the specified infection
         :param infections: the infection(s) to search for
@@ -37,7 +41,9 @@ class Portfolio(BitSight):
 
         return self.get_portfolio(params=parameters, **kwargs)
 
-    def get_vulnerable_companies(self, vulnerabilities, params=None, **kwargs):
+    def get_vulnerable_companies(
+        self, vulnerabilities: str, params: QueryParams = None, **kwargs
+    ):
         """
         Get all companies in your portfolio impacted by the specified infection
         :param vulnerabilities: the vulnerability(or vulnerabilities) to search for
@@ -50,7 +56,7 @@ class Portfolio(BitSight):
 
         return self.get_portfolio(params=parameters, **kwargs)
 
-    def get_portfolio_statistics(self, params=None, **kwargs):
+    def get_portfolio_statistics(self, params: QueryParams = None, **kwargs):
         """
         Get statistics for your entire portfolio
         :param params: filters for the request
