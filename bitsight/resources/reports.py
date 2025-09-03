@@ -4,11 +4,11 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 class Reports(BitSight):
     v1_endpoint = f"{Endpoints.V1.reports}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
     def post_download_company_report(
-            self, guid, file_path="company_report.pdf", **kwargs
+        self, guid: str, file_path: str = "company_report.pdf", **kwargs
     ):
         """
         Request to download a company report from BitSight
