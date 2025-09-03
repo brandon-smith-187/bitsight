@@ -4,10 +4,12 @@ from bitsight.resources.bitsight import BitSight, Endpoints
 class Subscriptions(BitSight):
     v1_endpoint = f"{Endpoints.V1.subscriptions}"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, api_key: str | None = None):
+        super().__init__(api_key)
 
-    def post_subscribe(self, guid, license_type="continuous_monitoring", **kwargs):
+    def post_subscribe(
+        self, guid: str, license_type: str = "continuous_monitoring", **kwargs
+    ):
         """
         Request to subscribe to a company in BitSight
         :param guid: the guid for the company to subscribe to
@@ -19,12 +21,12 @@ class Subscriptions(BitSight):
         return self.post(endpoint=self.v1_endpoint, json=payload, **kwargs).json()
 
     def post_bulk_subscribe(
-            self,
-            guids,
-            license_type="continuous_monitoring",
-            tier=None,
-            folders=None,
-            **kwargs,
+        self,
+        guids: list[str],
+        license_type: str = "continuous_monitoring",
+        tier: str | None = None,
+        folders: str | None = None,
+        **kwargs,
     ):
         """
         Request to subscribe to multiple companies in BitSight
@@ -47,7 +49,7 @@ class Subscriptions(BitSight):
         response = self.post(endpoint=self.v1_endpoint + "bulk", json=payload, **kwargs)
         return response
 
-    def delete_unsubscribe(self, guid, **kwargs):
+    def delete_unsubscribe(self, guid: str, **kwargs):
         """
         Unsubscribe from a company in BitSight
         :param guid: the guid for the company to be unsubscribed from
