@@ -7,8 +7,6 @@ import logging
 
 import requests
 
-from setup import version as current_version
-
 
 class Status(Enum):
     okay = (200, "Everything worked as expected")
@@ -118,7 +116,7 @@ class RequestHandler(requests.Session):
         self.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent":f"bitsight-api-library-{current_version}"
+                "User-Agent": "bitsight-api-library-0.2.3"
                 }
             )
         logging.basicConfig(level=logging.INFO)
