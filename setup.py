@@ -3,10 +3,11 @@ from setuptools import setup
 from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
+version = '0.2.3'
 
 setup(
     name='bitsight',
-    version='0.2.2',
+    version=version,
     packages=['bitsight', 'bitsight.api_io', 'bitsight.resources'],
     url='https://github.com/brandon-smith-187/bitsight',
     license='MIT',

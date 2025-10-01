@@ -7,6 +7,8 @@ import logging
 
 import requests
 
+from setup import version as current_version
+
 
 class Status(Enum):
     okay = (200, "Everything worked as expected")
@@ -113,7 +115,12 @@ class RequestHandler(requests.Session):
             self.api_key = input("Please enter your BitSight API Key: ")
 
         self.auth = (self.api_key, EMPTY_STRING)
-        self.headers.update({"Accept": "application/json"})
+        self.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent":f"bitsight-api-library-{current_version}"
+                }
+            )
         logging.basicConfig(level=logging.INFO)
 
     def _bitsight_request(self, method, request_url, **kwargs):
