@@ -116,7 +116,7 @@ class RequestHandler(requests.Session):
         self.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent": "bitsight-api-library-0.2.3"
+                "User-Agent": "bitsight-api-library-0.2.4"
                 }
             )
         logging.basicConfig(level=logging.INFO)
